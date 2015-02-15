@@ -11,11 +11,13 @@
 
 library(dplyr)
 
+## Setup steps:
 ## if(!(file.exists("./data") & file.info("./data")$isdir)) dir.create("./data")
 ## download.file(
-##     paste( "https://d396qusza40orc.cloudfront.net/"
-##           ,"getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
-##           ,sep = ""
+##     paste( 
+##          "https://d396qusza40orc.cloudfront.net/"
+##         ,"getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+##         ,sep = ""
 ##     )
 ##     ,destfile = "./data/data.zip"
 ## )
@@ -24,15 +26,16 @@ library(dplyr)
 
 ## Date downloaded: 2015-02-14 06:53:52 MST
 
-files <- c( "features"        = "./data/UCI HAR Dataset/features.txt"
-           ,"activity_lables" = "./data/UCI HAR Dataset/activity_labels.txt"
-           ,"test_data"       = "./data/UCI HAR Dataset/test/X_test.txt"
-           ,"test_activity"   = "./data/UCI HAR Dataset/test/y_test.txt"
-           ,"test_subject"    = "./data/UCI HAR Dataset/test/subject_test.txt"
-           ,"train_data"      = "./data/UCI HAR Dataset/train/X_train.txt"
-           ,"train_activity"  = "./data/UCI HAR Dataset/train/y_train.txt"
-           ,"train_subject"   = "./data/UCI HAR Dataset/train/subject_train.txt"
-         )
+files <- c( 
+     "features"         = "./data/UCI HAR Dataset/features.txt"
+    ,"activity_lables" = "./data/UCI HAR Dataset/activity_labels.txt"
+    ,"test_data"       = "./data/UCI HAR Dataset/test/X_test.txt"
+    ,"test_activity"   = "./data/UCI HAR Dataset/test/y_test.txt"
+    ,"test_subject"    = "./data/UCI HAR Dataset/test/subject_test.txt"
+    ,"train_data"      = "./data/UCI HAR Dataset/train/X_train.txt"
+    ,"train_activity"  = "./data/UCI HAR Dataset/train/y_train.txt"
+    ,"train_subject"   = "./data/UCI HAR Dataset/train/subject_train.txt"
+)
 
 ## The {test,train}_data data sets both contain 561 variables with 2,947 and 
 ## 7,352 observations, respectively.  Wrapping the read.tables with rbind 
@@ -42,9 +45,10 @@ files <- c( "features"        = "./data/UCI HAR Dataset/features.txt"
 ## step is more efficient, but all subsequent 'stacked' actions _must_ proceed 
 ## by 'stacking' test data atop train data to maintain coherence.
 
-data <- rbind( read.table(files[["test_data"]], fill = T)
-              ,read.table(files[["train_data"]], fill = T)
-        )
+data <- rbind( 
+     read.table(files[["test_data"]], fill = T)
+    ,read.table(files[["train_data"]], fill = T)
+)
 
 ## Capture the number of variables in the data set before additional data 
 ## are appended.  Used in the duplicate column renaming and the "measurements"
@@ -73,7 +77,7 @@ for (i in 1:nVar){
         ,{    
               col_count[[names(data)[i]]] <- col_count[[names(data)[i]]] + 1
               names(data)[i] <- paste( 
-                                    names(data)[i]
+                                     names(data)[i]
                                     ,"."
                                     ,col_count[[names(data)[i]]]
                                     ,sep = ""
@@ -88,22 +92,27 @@ for (i in 1:nVar){
 ## lengths of the {test, train}_subject files.
 
 data$activity_class <- factor(
-                           c( rep( "test"
-                                  ,length(readLines(files[["test_subject"]]))
-                              )
-                             ,rep( "train"
-                                  ,length(readLines(files[["train_subject"]]))
-                              )
-                           )
-                       )
+    c(
+        rep(
+             "test"
+            ,length(readLines(files[["test_subject"]]))
+        )
+        ,rep(
+             "train"
+            ,length(readLines(files[["train_subject"]]))
+        )
+    )
+)
 
 ## Append new column "subject" to "data" by rbind on the {test_train}_subject
 ## files.
 
-data$subject <- as.integer(c( readLines(files[["test_subject"]])
-                             ,readLines(files[["train_subject"]])
-                           )
-                )
+data$subject <- as.integer(
+    c(
+         readLines(files[["test_subject"]])
+        ,readLines(files[["train_subject"]])
+    )
+)
 
 ## The {test,train}_activity files contain the IDs of the actvities 
 ## corresponding to each row of the test and train data sets, respectively. The 
@@ -115,18 +124,22 @@ data$subject <- as.integer(c( readLines(files[["test_subject"]])
 ## "V2" from the merged data frame.
 
 data$activity  <- factor(
-                      merge( rbind( read.table(files[["test_activity"]])
-                            ,read.table(files[["train_activity"]]))
-                            ,read.table(files[["activity_lables"]])
-                      )$V2
-                  )
+    merge(
+        rbind(
+             read.table(files[["test_activity"]])
+            ,read.table(files[["train_activity"]])
+        )
+        ,read.table(files[["activity_lables"]])
+    )$V2
+)
 
 ## Extract the mean and standard deviation for each measurement and preserve
 ## in "measurements".
 
-measurements <- data.frame( "mean" = sapply(data[,1:nVar], mean, na.rm = T)
-                           ,"std_dev" = sapply(data[,1:nVar], sd, na.rm = T)
-                )
+measurements <- data.frame(
+     "mean" = sapply(data[,1:nVar], mean, na.rm = T)
+    ,"std_dev" = sapply(data[,1:nVar], sd, na.rm = T)
+)
 
 ## create a second, independent tidy data set with the average of each variable
 ## for each activity and each subject.
@@ -136,10 +149,11 @@ measurements <- data.frame( "mean" = sapply(data[,1:nVar], mean, na.rm = T)
 # g <- group_by(data, subject, activity)
 # summarize(g, mean(tBodyAcc.mean...X, na.rm = T))
 
-summarized_data <- (    data 
-                    %>% group_by(subject, activity, activity_class)
-                    %>% summarise_each(funs(mean))
-                   )
+summarized_data <- (
+        data 
+    %>% group_by(subject, activity, activity_class)
+    %>% summarise_each(funs(mean))
+)
 
 ## Cleanup processing variables
 rm(files, nVar, col_count, i)
