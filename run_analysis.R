@@ -77,11 +77,11 @@ for (i in 1:nVar){
         ,{    
               col_count[[names(data)[i]]] <- col_count[[names(data)[i]]] + 1
               names(data)[i] <- paste( 
-                                     names(data)[i]
-                                    ,"."
-                                    ,col_count[[names(data)[i]]]
-                                    ,sep = ""
-                                )
+                   names(data)[i]
+                  ,"."
+                  ,col_count[[names(data)[i]]]
+                  ,sep = ""
+              )
          }
         ,col_count[[names(data)[i]]] <- 1
     )        
