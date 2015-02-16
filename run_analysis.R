@@ -1,5 +1,14 @@
+## The course instructions provided for this script are as follows:
+## 1. Merges the training and the test sets to create one data set.
+## 2. Extracts only the measurements on the mean and standard deviation for each 
+##    measurement. 
+## 3. Uses descriptive activity names to name the activities in the data set
+## 4. Appropriately labels the data set with descriptive variable names. 
+## 5. From the data set in step 4, creates a second, independent tidy data set 
+##    with the average of each variable for each activity and each subject.
+
 ## Non-validated assumptions about data:
-## -All files in "files" exist and are readible
+## -All files in "files" exist and are readible (see example in "Setup steps.")
 ## -features.txt contains one numbered line corresponding to each variable
 ##    in X_{test,train}.txt
 ## -X_{test,train}.txt contain the same order and number of variables. 
@@ -8,8 +17,6 @@
 ##    label in activity_labels.txt
 ## -subject_{test,train}.txt contain one line corresponding to each observation
 ##    in X_{test,train}.txt
-
-library(dplyr)
 
 ## Setup steps:
 ## if(!(file.exists("./data") & file.info("./data")$isdir)) dir.create("./data")
@@ -24,7 +31,10 @@ library(dplyr)
 ## write(date(), file = "./data/date_downloaded.txt")
 ## unzip("./data/data.zip", exdir = "./data")
 
-## Date downloaded: 2015-02-14 06:53:52 MST
+## Date downloaded: Sat Feb 14 06:53:52 2015
+
+library(plyr)
+library(dplyr)
 
 files <- c( 
      "features"         = "./data/UCI HAR Dataset/features.txt"
@@ -37,123 +47,39 @@ files <- c(
     ,"train_subject"   = "./data/UCI HAR Dataset/train/subject_train.txt"
 )
 
-## The {test,train}_data data sets both contain 561 variables with 2,947 and 
-## 7,352 observations, respectively.  Wrapping the read.tables with rbind 
-## 'stacks' the test data set atop the train data set, creating a data frame 
-## with 10,299 observations of 561 variables. The fill argument to read.table 
-## creates NA's for missing values. Combining the data sets by 'stacking' in one 
-## step is more efficient, but all subsequent 'stacked' actions _must_ proceed 
-## by 'stacking' test data atop train data to maintain coherence.
+## 1. Merges the training and the test sets to create one data set.
+## 1a. Read in the data
+## 1b. Mutate in the subjects
+## 1c. Mutate in the "activity_class" {test,train}
 
-data <- rbind( 
-     read.table(files[["test_data"]], fill = T)
-    ,read.table(files[["train_data"]], fill = T)
-)
+test_data <- read.table(files[["test_data"]]) %>%
+    mutate(subject = as.integer(readLines(files[["test_subject"]]))) %>%
+    mutate(activity_class = rep("test", n()))
 
-## Capture the number of variables in the data set before additional data 
-## are appended.  Used in the duplicate column renaming and the "measurements"
-## extract below.
+train_data <- read.table(files[["train_data"]]) %>%
+    mutate(subject = as.integer(readLines(files[["train_subject"]]))) %>%
+    mutate(activity_class = rep("train", n()))
 
-nVar <- ncol(data)
+## 1d. Add "activity" by joining "{test,train}_activity" and "activity_labels"
 
-## "features" contains a numbered list of column names for the test and train 
-## data sets.  Extract values from column V2 of features.txt and assign to 
-## names(data).
+test_data$activity <- join(
+     read.table(files[["test_activity"]])
+    ,read.table(files[["activity_lables"]])
+    ,by = "V1"
+)$V2
 
-names(data) <- read.table(files[["features"]])$V2
+train_data$activity <- join(
+     read.table(files[["train_activity"]])
+    ,read.table(files[["activity_lables"]])
+    ,by = "V1"
+)$V2
 
-## The data contain duplicate column names which is incompatible with the dplyr
-## summarize function.  The simple fix is to use "make.names" e.g.:
-## names(data) <- make.names(names(data), unique=TRUE)
-## but this changes column names in undersirable ways.  The following block
-## looks for duplicate column names and appends ".N" where "N" starts with
-## 2 and increments accordingly.
-## Example: fBodyAcc-bandsEnergy()-1,16, fBodyAcc-bandsEnergy()-1,16.2, etc.
+## 1e. Merge the the training and the test sets to create one data set.
+data <- rbind(test_data, train_data)
 
-col_count <- list()
-for (i in 1:nVar){
-    ifelse( 
-        is.numeric(col_count[[names(data)[i]]])
-        ,{    
-              col_count[[names(data)[i]]] <- col_count[[names(data)[i]]] + 1
-              names(data)[i] <- paste( 
-                   names(data)[i]
-                  ,"."
-                  ,col_count[[names(data)[i]]]
-                  ,sep = ""
-              )
-         }
-        ,col_count[[names(data)[i]]] <- 1
-    )        
-}
-
-## Append new column "activity_class" to "data" by repeating 'test' and 'train' 
-## by the number of observations of each class as derived by the respective 
-## lengths of the {test, train}_subject files.
-
-data$activity_class <- factor(
-    c(
-        rep(
-             "test"
-            ,length(readLines(files[["test_subject"]]))
-        )
-        ,rep(
-             "train"
-            ,length(readLines(files[["train_subject"]]))
-        )
-    )
-)
-
-## Append new column "subject" to "data" by rbind on the {test_train}_subject
-## files.
-
-data$subject <- as.integer(
-    c(
-         readLines(files[["test_subject"]])
-        ,readLines(files[["train_subject"]])
-    )
-)
-
-## The {test,train}_activity files contain the IDs of the actvities 
-## corresponding to each row of the test and train data sets, respectively. The 
-## activity_labels file contains the labels corresponding to the activity
-## IDs within {test,train}_activity.  Merging the rbind of {test,train}_activity 
-## with activity_labels creates a data frame with observations corresponding to 
-## those in the "data" data frame with two variables, the activity ID in V1 and 
-## the activity label in V2. Append new column "activity" to "data" with column
-## "V2" from the merged data frame.
-
-data$activity  <- factor(
-    merge(
-        rbind(
-             read.table(files[["test_activity"]])
-            ,read.table(files[["train_activity"]])
-        )
-        ,read.table(files[["activity_lables"]])
-    )$V2
-)
-
-## Extract the mean and standard deviation for each measurement and preserve
-## in "measurements".
-
-measurements <- data.frame(
-     "mean" = sapply(data[,1:nVar], mean, na.rm = T)
-    ,"std_dev" = sapply(data[,1:nVar], sd, na.rm = T)
-)
-
-## create a second, independent tidy data set with the average of each variable
-## for each activity and each subject.
-
-## Average each variable summarized by activity and subject.
-# names(data) <- make.names(names(data), unique=TRUE)
-# g <- group_by(data, subject, activity)
-# summarize(g, mean(tBodyAcc.mean...X, na.rm = T))
-
-summarized_data <- (
-        data 
-    %>% group_by(subject, activity, activity_class)
-    %>% summarise_each(funs(mean))
-)
-
-## Cleanup processing variables
-rm(files, nVar, col_count, i)
+## 2. Extracts only the measurements on the mean and standard deviation for each 
+##    measurement. 
+## 3. Uses descriptive activity names to name the activities in the data set
+## 4. Appropriately labels the data set with descriptive variable names
+## 5. From the data set in step 4, creates a second, independent tidy data set 
+##    with the average of each variable for each activity and each subject.
