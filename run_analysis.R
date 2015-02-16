@@ -46,7 +46,7 @@ my <- new.env()
 ## Create a character vector of the files required for processing.
 
 my$files <- c( 
-     "features"       = "./data/UCI HAR Dataset/features.txt"
+    "features"        = "./data/UCI HAR Dataset/features.txt"
     ,"activityLables" = "./data/UCI HAR Dataset/activity_labels.txt"
     ,"testData"       = "./data/UCI HAR Dataset/test/X_test.txt"
     ,"testActivity"   = "./data/UCI HAR Dataset/test/y_test.txt"
@@ -56,64 +56,62 @@ my$files <- c(
     ,"trainSubject"   = "./data/UCI HAR Dataset/train/subject_train.txt"
 )
 
-## 1. Merges the training and the test sets to create one data set.
-## 3. Uses descriptive activity names to name the activities in the data set
-## 1a. Read in the {test, train} data
-## 1b. Mutate in the {test, train} subjects
-## 1c. Mutate in the {test, train} "activity_class".
+## Merge data sets (1)
 
-my$testData <- read.table(my$files[["testData"]]) %>%
-    mutate(subject = as.integer(readLines(my$files[["testSubject"]]))) %>%
-    mutate(activity_class = rep("test", n()))
-
-my$trainData <- read.table(my$files[["trainData"]]) %>%
-    mutate(subject = as.integer(readLines(my$files[["trainSubject"]]))) %>%
-    mutate(activity_class = rep("train", n()))
-
-## 1d. Add "activity" by joining "{test,train}Activity" and "activityLabels"
-##     This implicitly meets the requirements of requirement 3.
-
-my$testData$activity <- join(
-     read.table(my$files[["testActivity"]])
-    ,read.table(my$files[["activityLables"]])
-    ,by = "V1"
-)$V2
-
-my$trainData$activity <- join(
-     read.table(my$files[["trainActivity"]])
-    ,read.table(my$files[["activityLables"]])
-    ,by = "V1"
-)$V2
-
-## 1e. Merge the the training and the test sets to create one data set.
-
-my$data <- rbind(my$testData, my$trainData)
-
-## 4. Appropriately labels the data set with descriptive variable names.
-## The "features" file contains a numbered list of column names for the  
-## {test,train} data sets.  Extract values from column V2 of features.txt and  
-## assign to names(data). Doing this before requirement 2 makes that task
-## both easier to do and understand.
-
-my$sourceColNames <- as.character(read.table(my$files[["features"]])$V2)
-names(my$data)[1:length(my$sourceColNames)] <- my$sourceColNames
-
-## 2. Extracts only the measurements on the mean and standard deviation for each 
-##    measurement. 
-## Create a character vector of columns to remove by grepping the inverse of the
-## columns from "my$sourceColNames" matching a case-insensitive search for "std"
-## and "mean".  This preserves any columns that have been added as well as any
-## that contain "std" or "mean" (upper or lowercase) anywhere in the column
-## name.
-
-my$dropCols <- grep(
-     "mean|std"
-    ,my$sourceColNames
-    ,ignore.case = T
-    ,invert = T
-    , value = T
+my$data <- rbind( 
+    read.table(my$files[["testData"]])
+    ,read.table(my$files[["trainData"]])
 )
-my$data <- my$data[, ! names(my$data) %in% my$dropCols]
+
+## label data set (4)
+
+names(my$data) <- as.character(read.table(my$files[["features"]])$V2)
+
+## Preserve Mean/StdDev (2)
+
+my$data <- my$data[, grep("mean|std", names(my$data), ignore.case = T)]
+
+## Add subject (3a)
+
+my$data <- mutate(my$data, subject = 
+    as.integer(
+        c(
+             readLines(my$files[["testSubject"]])
+            ,readLines(my$files[["trainSubject"]])
+        )
+    )
+)
+
+## Add activity_class (3b)
+## Todo: Wrap in factor later
+
+my$data <- mutate(
+    my$data
+    ,activity_class = c(
+        rep(
+            "test"
+            ,length(readLines(my$files[["testSubject"]]))
+        )
+        ,rep(
+            "train"
+            ,length(readLines(my$files[["trainSubject"]]))
+        )
+    )
+)
+
+## Add activity
+## TODO: Add factor
+
+my$data <- mutate(my$data, activity = 
+    join(
+        rbind(
+            read.table(my$files[["testActivity"]])
+            ,read.table(my$files[["trainActivity"]])
+        )
+        ,read.table(my$files[["activityLables"]])
+        ,by = "V1"
+    )$V2
+)
 
 
 ## 5. From the data set in step 4, creates a second, independent tidy data set 
