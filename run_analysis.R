@@ -1,4 +1,4 @@
-## The course instructions provided for this script are as follows:
+## The requirements for this script provided within the course are as follows:
 ## 1. Merges the training and the test sets to create one data set.
 ## 2. Extracts only the measurements on the mean and standard deviation for each 
 ##    measurement. 
@@ -7,7 +7,7 @@
 ## 5. From the data set in step 4, creates a second, independent tidy data set 
 ##    with the average of each variable for each activity and each subject.
 
-## Non-validated assumptions about data:
+## Non-validated assumptions about the data:
 ## -All files in "files" exist and are readible (see example in "Setup steps.")
 ## -features.txt contains one numbered line corresponding to each variable
 ##    in X_{test, train}.txt
@@ -58,7 +58,6 @@ my$files <- c(
 
 ## 1. Merges the training and the test sets to create one data set.
 ## 3. Uses descriptive activity names to name the activities in the data set
-## Steps 1a-1d implicitly meet the requirements of instruction 3.
 ## 1a. Read in the {test, train} data
 ## 1b. Mutate in the {test, train} subjects
 ## 1c. Mutate in the {test, train} "activity_class".
@@ -72,6 +71,7 @@ my$trainData <- read.table(my$files[["trainData"]]) %>%
     mutate(activity_class = rep("train", n()))
 
 ## 1d. Add "activity" by joining "{test,train}Activity" and "activityLabels"
+##     This implicitly meets the requirements of requirement 3.
 
 my$testData$activity <- join(
      read.table(my$files[["testActivity"]])
@@ -92,8 +92,8 @@ my$data <- rbind(my$testData, my$trainData)
 ## 4. Appropriately labels the data set with descriptive variable names.
 ## The "features" file contains a numbered list of column names for the  
 ## {test,train} data sets.  Extract values from column V2 of features.txt and  
-## assign to names(data). Doing this before requirement 2 makes that both easier
-## to do and understand.
+## assign to names(data). Doing this before requirement 2 makes that task
+## both easier to do and understand.
 
 my$sourceColNames <- as.character(read.table(my$files[["features"]])$V2)
 names(my$data)[1:length(my$sourceColNames)] <- my$sourceColNames
@@ -118,6 +118,12 @@ my$data <- my$data[, ! names(my$data) %in% my$dropCols]
 
 ## 5. From the data set in step 4, creates a second, independent tidy data set 
 ##    with the average of each variable for each activity and each subject.
+
+my$summarizedData <- (
+    my$data
+    %>% group_by(subject, activity, activity_class)
+    %>% summarise_each(funs(mean))
+)
 
 ## Cleanup environment
 ## rm(my)
