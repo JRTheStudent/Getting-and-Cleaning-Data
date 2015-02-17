@@ -156,4 +156,4 @@ my$summarizedData <- (
 )
 
 ## Cleanup environment.
-rm(files, envir=my)
+#rm(files, envir=my)
