@@ -1,9 +1,3 @@
----
-title: "README"
-author: "J.R."
-date: "Wednesday, February 18, 2015"
-output: html_document
----
 # Getting and Cleaning Data: Course project
 
 ## 1: Overview
@@ -13,11 +7,11 @@ the data and how to use the code.
 
 ## 2: Repository Contents
 1. README.md (this file) - Describes the following:
-* The contents of the repository.
-* How the code works and the steps required to transform the raw data set to
-  the tidy summarized output.
-* An explanation of how to use the code and data within this repository.
-* An explanation of how to reproduce the output.
+  * The contents of the repository.
+  * How the code works and the steps required to transform the raw data set to
+    the tidy summarized output.
+  * An explanation of how to use the code and data within this repository.
+  * An explanation of how to reproduce the output.
 2. run_analysis.R[3] - The code used to transform the raw data set to the tidy
    summarized output.
 3. summarized_data.txt[4] - The output from run_analysis.R
