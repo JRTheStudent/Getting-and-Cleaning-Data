@@ -56,7 +56,7 @@ label in activity_labels.txt
 in X_{test, train}.txt
 
 ### 3a. Requirement 1: Merge the test and training data sets.
-#### Lines 68-80
+###### Lines 68-80
 The {test, train}Data data sets both contain 561 variables with 2,947 and
 7,352 observations, respectively.  Wrapping "read.tables" with "rbind"
 'stacks' the test data set atop the train data set, creating a data frame
@@ -66,13 +66,13 @@ actions _must_ proceed by 'stacking' test data atop train data to maintain
 coherence.
 
 ### 3b. Requirement 4: Label the data set with descriptive variable names.
-#### Lines 82-87
+###### Lines 82-87
 The "features" files contains a numbered list of column names for the test
 and train data sets.  Extract values from column "V2" of "features" and
 assign to "names(my$data)."
 
 ### 3c. Requirement 2: Extract only mean and standard deviation measurements.
-#### Lines 89-97
+###### Lines 89-97
 Subselect columns with variable names containing the character strings
 "mean" and "std" (standard deviation), case-insensitively and in any position
 within the variable name.  As the requirements are not explicit and the
@@ -80,7 +80,7 @@ inclusion of (potentially) superfluous variables does not affect required
 processing (the variables are independent in the processing required) it is preferable to err on the side of broader inclusivity.
 
 ### 3d. Append columns "subject" and "activity class" to the merged data set.
-#### Lines 99-128
+###### Lines 99-128
 Deferring the appending of new columns to the data set until after meeting requirements 4 and 2 (detailed in 3b and 3c above) makes those steps both simpler to perform and more flexible in the code- any subsequent columns can be safely added after the origin data is labeled and extraneous columns are dropped. 
 
 The column "subject" is appended to "my$data" by rbind on the {test, train}Subjectfiles.  Column "activity_class" is appended to "my$data" by repeating 'test' and
@@ -88,7 +88,7 @@ The column "subject" is appended to "my$data" by rbind on the {test, train}Subje
 respective lengths of the {test, train}Subject files.
 
 ### 3e. Requirement 3: Use descriptive activity names for the activity variable.
-#### Lines 130-150
+###### Lines 130-150
 The {test, train}Activity files contain the IDs of the actvities
 corresponding to each row of the test and train data sets, respectively. The
 "activityLabels" file contains the labels corresponding to the activity
@@ -99,7 +99,7 @@ and the activity label in V2. Append new column "activity" to "data" with
 column "V2" from the merged data frame.
 
 ### 3f. Requirement 5: Create independent, tidy data set with the average of each variable grouped by activity and subject.
-#### Lines 152-163
+###### Lines 152-163
 Use the "dplyr" "group_by" function to aggregate the data by subject and
 activity. Apply mean to each un-grouped column via the "dplyr"
 "summarise_each" function.
