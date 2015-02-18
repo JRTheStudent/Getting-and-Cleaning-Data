@@ -7,10 +7,16 @@
 ## 5. From the data set in step 4, creates a second, independent tidy data set
 ##    with the average of each variable for each activity and each subject.
 
-## TODO: Output
+## This script creates an environment named "my" which contains three variables:
+## files: A character vector consisting of the files used in processing and 
+## output.
+## data: The data frame constructed to satisfy requirements 1-4.
+## summarizedData: The data frame constructed to satisfy requirement 5.
+## This script also outputs the "summarizedData" both to the file 
+## "summarized_data.txt" in the working directory as well as to the console.
 
 ## Non-validated assumptions about the data:
-## -All files in "files" exist and are readible (see example in "Setup steps.")
+## -All files in "files" exist and are readable (see example in "Setup steps.")
 ## -features.txt contains one numbered line corresponding to each variable
 ##    in X_{test, train}.txt
 ## -X_{test, train}.txt contain the same order and number of variables.
@@ -56,11 +62,12 @@ my$files <- c(
     ,"trainData"      = "./data/UCI HAR Dataset/train/X_train.txt"
     ,"trainActivity"  = "./data/UCI HAR Dataset/train/y_train.txt"
     ,"trainSubject"   = "./data/UCI HAR Dataset/train/subject_train.txt"
+    ,"sdOutput"       = "./summarized_data.txt"
 )
 
 ## Requirement 1: Merge the test and training data sets.
 ## The {test, train}Data data sets both contain 561 variables with 2,947 and
-## 7,352 observations, respectively.  Wrapping the read.tables with rbind
+## 7,352 observations, respectively.  Wrapping "read.tables" with "rbind"
 ## 'stacks' the test data set atop the train data set, creating a data frame
 ## with 10,299 observations of 561 variables. Combining the data sets by
 ## 'stacking' in one step is more efficient but all subsequent 'stacked'
@@ -89,16 +96,16 @@ names(my$data) <- as.character(read.table(my$files[["features"]])$V2)
 
 my$data <- my$data[, grep("mean|std", names(my$data), ignore.case = T)]
 
-## Append new column "subject" to "data" by rbind on the {test, train}Subject
+## Append new column "subject" to "my$data" by rbind on the {test, train}Subject
 ## files.
 
 my$data <- mutate(my$data, subject =
-    as.integer(
-        c(
-             readLines(my$files[["testSubject"]])
-            ,readLines(my$files[["trainSubject"]])
-        )
-    )
+                      as.integer(
+                          c(
+                              readLines(my$files[["testSubject"]])
+                              ,readLines(my$files[["trainSubject"]])
+                          )
+                      )
 )
 
 ## Append new column "activity_class" to "my$data" by repeating 'test' and
@@ -144,7 +151,7 @@ my$data <- mutate(my$data, activity =
 
 ## Requirement 5: Create independent, tidy data set with the average of each
 ## variable grouped by activity and subject.
-## Used the "dplyr" "group_by" function to aggregate the data by subject and
+## Use the "dplyr" "group_by" function to aggregate the data by subject and
 ## activity. Apply mean to each un-grouped column via the "dplyr"
 ## "summarise_each" function.
 ## TODO: Exclude activity_class from group?
@@ -155,5 +162,8 @@ my$summarizedData <- (
     %>% summarise_each(funs(mean))
 )
 
-## Cleanup environment.
-#rm(files, envir=my)
+## Write "summarizedData" to a file
+write.table(my$summarizedData, my$files[["sdOutput"]], row.names = F)
+
+## Output "summarizedData"
+print(my$summarizedData)
