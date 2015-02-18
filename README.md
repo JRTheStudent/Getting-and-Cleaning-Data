@@ -21,6 +21,7 @@ the data and how to use the code.
 ## 3: run_analysis.R - Explanation of Data Transformation and Summary
 This script is intended to be executed by the R "source" command - it does not
 encapsulate processing within a function.   The requirements for this script provided within the course[6] are as follows:
+
 1. Merges the training and the test sets to create one data set.
 2. Extracts only the measurements on the mean and standard deviation for each
 measurement.
