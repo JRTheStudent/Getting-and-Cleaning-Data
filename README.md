@@ -6,9 +6,9 @@ This repository contains the code required to process the "Human Activity Recogn
 ## 2: Repository Contents
 1. README.md (this file) - Describes the following:
   * The contents of the repository.
-  * How the code works and the steps required to transform the raw data set to     the tidy summarized output.
+  * How the code works and the steps required to transform the raw data set to the tidy summarized output.
   * An explanation of how to use the code and data within this repository.
-2. run_analysis.R[3] - The code used to transform the raw data set to the tidy    summarized output.
+2. run_analysis.R[3] - The code used to transform the raw data set to the tidy summarized output.
 3. summarized_data.txt[4] - The output from run_analysis.R.
 4. CodeBook.md[5] - The Code Book/Data Dictionary describing variables in the   output (summarized_data.txt).
 
@@ -34,17 +34,17 @@ The "UCIHARSummarize" function requires no parameters and makes the following no
 ###### Lines 25-44
 The X_{test, train}.txt data sets both contain 561 variables with 2,947 and 7,352 observations, respectively.  Wrapping "read.tables" with "rbind" 'stacks' the test data set atop the train data set, creating a data frame with 10,299 observations of 561 variables. Combining the data sets by 'stacking' in one step is more efficient but all subsequent 'stacked' actions _must_ proceed by 'stacking' test data atop train data to maintain coherence.  
 
-After creating and populating the data set with the measurement data, the "subect" column is appended via "rbind" "mutate" wrapping "readLines" of the subject_{test, train}.txt files.
+After creating and populating the data set with the measurement data, the "subject" column is appended via "rbind" "mutate" wrapping "readLines" of the subject_{test, train}.txt files.
 
 ### 3b. Requirement 2: Extract only mean and standard deviation measurements.
 ###### Lines 46-56
 This step sub-selects columns with variable names containing the character strings "mean" and "std" (standard deviation), case-insensitively and in any position within the variable name.  As the course requirements are not explicit and the inclusion of (potentially) superfluous variables does not affect required processing (the variables are independent in the processing required) it is preferable to err on the side of broader inclusivity. 86 measurement variables match this criteria, thus this trims the merged data frame to 87 variables (the 86 matching variables as well as "subject" which was appended above) while still maintaining 10,299 observations.
 
-The features.txt file contains a numbered list of column names corresponding to the test and train data sets.  This file is read into a variable, then "grep" is applied (using the criteria described above) to identify column names that match the critera and preserve them in the variable "oColKeepNames" to assist in the fulfillment of Requirement 4 below.  Finally grep is used again with the same criteria, but this time with the "invert" parameter to identify column numbers that do not match the critera and they are subselected out of "data."
+The features.txt file contains a numbered list of column names corresponding to the test and train data sets.  This file is read into a variable, then "grep" is applied (using the criteria described above) to identify column names that match the criteria and preserve them in the variable "oColKeepNames" to assist in the fulfilment of Requirement 4 below.  Finally "grep" is used again with the same criteria, but this time with the "invert" parameter to identify column numbers that do not match the criteria and they are subselected out of "data."
 
 ### 3c. Requirement 3: Use descriptive activity names for the activity variable.
 ###### Lines 58-72
-The y_{test, train}.txt files contain the IDs of the actvities corresponding to each row of the test and train data sets, respectively. The activity_labels.txt file contains the labels corresponding to the activity IDs within y_{test, train}.txt.  Joining the rbind of y_{test, train}.txt with "activity_labels.txt" creates a data frame with observations corresponding to those in the "data" data frame with two variables, the activity ID in "V1" and the activity label in "V2". Append the new column "activity" to "data" by mutating in the selection of column "V2" from the joined data frame described above.
+The y_{test, train}.txt files contain the IDs of the activities corresponding to each row of the test and train data sets, respectively. The activity_labels.txt file contains the labels corresponding to the activity IDs within y_{test, train}.txt.  Applying the "dplyr" "join" function the "rbind" of y_{test, train}.txt with "activity_labels.txt" creates a data frame with observations corresponding to those in the "data" data frame with two variables, the activity ID in "V1" and the activity label in "V2". Append the new column "activity" to "data" by mutating in the selection of column "V2" from the joined data frame described above.
 
 ### 3d. Requirement 4: Label the data set with descriptive variable names.
 ###### Lines 74-76
@@ -77,9 +77,9 @@ The output produced by step 5 is a data frame consisting of 180 observations of 
 3. Each observation of the summarized data consists of a discrete and logical set of variables of the same "kind".
 4. Does not apply as the output consists of one table.
 
-Per the course requirements [6], the variable names of the data are descriptive both in the working and summarized data sets ("data" and "sData", respectively). In both cases the appended columns ("subject"" and "activity") are labeled as such, and the descriptive activity names have been added to the "activity" variable as defined in "activity_labels.txt."  In the working data set "data" the measurement variables (columns 1-86) are named with the labels identified within "activities.txt."  In the summarized data set "sData" the measurement colums are averaged by groupings o activity and subject, thus the prefix "mean_" is prepended to the associated measurement name.  For details about the summarized data see the Code Book[5].
+Per the course requirements [6], the variable names of the data are descriptive both in the working and summarized data sets ("data" and "sData", respectively). In both cases the appended columns ("subject"" and "activity") are labelled as such, and the descriptive activity names have been added to the "activity" variable as defined in "activity_labels.txt."  In the working data set "data" the measurement variables (columns 1-86) are named with the labels identified within "activities.txt."  In the summarized data set "sData" the measurement columns are averaged by groupings o activity and subject, thus the prefix "mean_" is prepended to the associated measurement name.  For details about the summarized data see the Code Book[5].
 
-Requirement 5 is met by using the "dplyr" "group_by" function to aggregate the data by activity and subject. Apply mean to each un-grouped column via the "dplyr" "summarise_each" function. This produces a data frame with 180 observations (30 subjects each performing 6 activities) by 88 variables (subject, activity and the means of the 86 measurement variables grouped by subject and activity).
+Requirement 5 is met by using the "dplyr" "group_by" function to aggregate the data by activity and subject. Apply mean to each ungrouped column via the "dplyr" "summarise_each" function. This produces a data frame with 180 observations (30 subjects each performing 6 activities) by 88 variables (subject, activity and the means of the 86 measurement variables grouped by subject and activity).
 
 ## 4: How to Use the Code and Data Within this Repository and Reproduce the Results.
 
