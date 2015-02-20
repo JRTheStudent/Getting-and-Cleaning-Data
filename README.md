@@ -1,4 +1,5 @@
-# Getting and Cleaning Data: Course project README
+# Getting and Cleaning Data: 
+# Course Project README
 
 ## 1: Overview
 This repository contains the code required to process the "Human Activity Recognition Using Smartphones Data Set"[1] from the UCI Machine Learning Repository[2], the output of the processing as well as various files describing the data and how to use the code and reproduce the output.
