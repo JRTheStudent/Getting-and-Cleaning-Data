@@ -61,19 +61,15 @@ Per the course definition[7], the components of tidy data are as follows:
 The output produced by step 5 is a data frame consisting of 180 observations of 88 variables.  The tidiness of the output matching the criteria established above can be demonstrated as follows:  
 
 1.86 measurement variables met the acceptance criteria (established in 3b), thus with the inclusion of the two identifying columns ("subject" and "activity"), the summarized data set maintains 88 variables.
-
 ```
 > ncol(sData)
 [1] 88
 ```
-
 2. The raw data set contained measurement data taken from 30 subjects each performing six activities.  Because requirement 5 calls for an aggregation by subject and activity, this produces 180 observations (30 * 6).
-
 ```
 > nrow(sData)
 [1] 180
 ```
-
 3. Each observation of the summarized data consists of a discrete and logical set of variables of the same "kind".
 4. Does not apply as the output consists of one table.
 
