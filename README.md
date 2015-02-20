@@ -8,6 +8,7 @@ This repository contains the code required to process the "Human Activity Recogn
   * The contents of the repository.
   * How the code works and the steps required to transform the raw data set to the tidy summarized output.
   * An explanation of how to use the code and data within this repository.
+  * Citations.
 2. run_analysis.R[3] - The code used to transform the raw data set to the tidy summarized output.
 3. summarized_data.txt[4] - The output from run_analysis.R.
 4. CodeBook.md[5] - The Code Book/Data Dictionary describing variables in the   output (summarized_data.txt).
@@ -44,7 +45,7 @@ The features.txt file contains a numbered list of column names corresponding to 
 
 ### 3c. Requirement 3: Use descriptive activity names for the activity variable.
 ###### Lines 58-72
-The y_{test, train}.txt files contain the IDs of the activities corresponding to each row of the test and train data sets, respectively. The activity_labels.txt file contains the labels corresponding to the activity IDs within y_{test, train}.txt.  Applying the "dplyr" "join" function the "rbind" of y_{test, train}.txt with "activity_labels.txt" creates a data frame with observations corresponding to those in the "data" data frame with two variables, the activity ID in "V1" and the activity label in "V2". Append the new column "activity" to "data" by mutating in the selection of column "V2" from the joined data frame described above.
+The y_{test, train}.txt files contain the IDs of the activities corresponding to each row of the test and train data sets, respectively. The activity_labels.txt file contains the labels corresponding to the activity IDs within y_{test, train}.txt.  Applying the "dplyr" "join" function to the "rbind" of y_{test, train}.txt with "activity_labels.txt" creates a data frame with observations corresponding to those in the "data" data frame with two variables, the activity ID in "V1" and the activity label in "V2". Append the new column "activity" to "data" by mutating in the selection of column "V2" from the joined data frame described above.
 
 ### 3d. Requirement 4: Label the data set with descriptive variable names.
 ###### Lines 74-76
@@ -53,6 +54,7 @@ In step 3b the variable "oColKeepNames" was derived and created to persist the d
 ### 3e. Requirement 5: Create independent, tidy data set with the average of each variable grouped by activity and subject.
 ###### Lines 78-95
 Per the course definition[7], the components of tidy data are as follows:
+
 1. Each Variable in one column
 2. Each different observation of that variable should be in a different row
 3. There should be one table for each "kind" of variable
@@ -70,7 +72,7 @@ The output produced by step 5 is a data frame consisting of 180 observations of 
 > nrow(sData)
 [1] 180
 ```
-* [Tidiness criteria 3] Each observation of the summarized data consists of a discrete and logical set of variables of the same "kind".
+* [Tidiness criteria 3] Each observation of the summarized data consists of a discrete and logical set of variables of the same "kind."
 * [Tidiness criteria 4] Does not apply as the output consists of one table.
 
 Per the course requirements [6], the variable names of the data are descriptive both in the working and summarized data sets ("data" and "sData", respectively). In both cases the appended columns ("subject"" and "activity") are labelled as such, and the descriptive activity names have been added to the "activity" variable as defined in "activity_labels.txt."  In the working data set "data" the measurement variables (columns 1-86) are named with the labels identified within "activities.txt."  In the summarized data set "sData" the measurement columns are averaged by groupings o activity and subject, thus the prefix "mean_" is prepended to the associated measurement name.  For details about the summarized data see the Code Book[5].
