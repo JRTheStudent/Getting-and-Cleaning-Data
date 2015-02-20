@@ -55,9 +55,9 @@ In step 3b the variable "oColKeepNames" was derived and created to persist the d
 ###### Lines 78-95
 Per the course definition[7], the components of tidy data are as follows:
 
-1. Each Variable in one column
-2. Each different observation of that variable should be in a different row
-3. There should be one table for each "kind" of variable
+1. Each variable in one column.
+2. Each different observation of that variable should be in a different row.
+3. There should be one table for each "kind" of variable.
 4. If you have multiple tables, they should include a column in the table that allows them to be linked.
 
 The output produced by step 5 is a data frame consisting of 180 observations of 88 variables.  The tidiness of the output matching the criteria established above can be demonstrated as follows:  
