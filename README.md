@@ -72,7 +72,7 @@ The output produced by step 5 is a data frame consisting of 180 observations of 
 > nrow(sData)
 [1] 180
 ```
-* [Tidiness criteria 3] Each observation of the summarized data consists of a discrete and logical set of variables of the same "kind."  Each observation (row) in the summarized data has a single column for both the description of the activity, the subject, and the means of the 86 measurement variables that meet the criteria established in 3b above, grouped by the activity and subject.
+* [Tidiness criteria 3] Each observation of the summarized data consists of a discrete and logical set of variables of the same "kind."  Each observation (row) in the summarized data has a single column for both the description of the activity and the subject as well as the means (grouped by activity and subject) of the 86 measurement variables that meet the criteria established in 3b above.
 * [Tidiness criteria 4] Does not apply as the output consists of one table.
 
 Per the course requirements [6], the variable names of the data are descriptive both in the working and summarized data sets ("data" and "sData", respectively). In both cases the appended columns ("subject"" and "activity") are labelled as such, and the descriptive activity names have been added to the "activitty" variable as defined in "activity_labels.txt."  In the working data set "data" the measurement variables (columns 1-86) are named with the labels identified within "activities.txt."  In the summarized data set "sData" the measurement columns are averaged by groupings o activity and subject, thus the prefix "mean_" is prepended to the associated measurement name.  For details about the summarized data see the Code Book[5].
